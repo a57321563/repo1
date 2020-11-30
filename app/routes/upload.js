@@ -3,6 +3,8 @@ const multer = require('multer');
 const csv = require('csvtojson');
 const randomDate = require('randomdate');
 const getAge = require('age-by-birthdate');
+const frequencyDistribution = require('frequency-distribution');
+const app = require('../app');
 var result = [];
 var fileName;
 var result;
@@ -28,8 +30,8 @@ router.post('/', upload.single('avatar'),function(req, res, next) {
           result.push(getAge(json[i].BIRTHDAY));
         }
       }
-      console.log(result);
-      res.send(fileName);
+      res.cookie('result',frequencyDistribution(result,5));
+      res.render('upload', { uploadOrNot: 'Uploaded' });
     }) 
   });
   
