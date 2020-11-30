@@ -1,7 +1,11 @@
 var express = require('express');
 const multer = require('multer');
-const fs = require('fs');
+const csv = require('csvtojson');
+const randomDate = require('randomdate');
+const getAge = require('age-by-birthdate');
+var result = [];
 var fileName;
+var result;
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null,'uploads/');
@@ -15,8 +19,18 @@ var upload = multer({storage: storage});
 var router = express.Router();
 
 router.post('/', upload.single('avatar'),function(req, res, next) {
-    fs.createReadStream('uploads/'+fileName);
-    res.send(fileName);
+    const converter = csv()
+    .fromFile('uploads/'+fileName)
+    .then((json) => {
+      for(let i = 0;i < json.length;i++){
+        if(json[i].BIRTHDAY==undefined){
+          json[i].BIRTHDAY=randomDate(new Date(1960,1,1),new Date(2000,1,1));
+          result.push(getAge(json[i].BIRTHDAY));
+        }
+      }
+      console.log(result);
+      res.send(fileName);
+    }) 
   });
   
   module.exports = router;
